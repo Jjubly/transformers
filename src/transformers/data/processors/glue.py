@@ -553,6 +553,7 @@ class BoolqProcessor(DataProcessor):
             text_b = line[1]
             label = line[-1]
             examples.append(InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        print(examples[0])
         return examples
     
     @classmethod
