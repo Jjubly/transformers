@@ -576,7 +576,7 @@ glue_tasks_num_labels = {
     "qnli": 2,
     "rte": 2,
     "wnli": 2,
-    "boolq": 2
+    "BoolQ": 2
 }
 
 glue_processors = {
@@ -590,7 +590,7 @@ glue_processors = {
     "qnli": QnliProcessor,
     "rte": RteProcessor,
     "wnli": WnliProcessor,
-    "boolq": BoolqProcessor
+    "BoolQ": BoolqProcessor
 }
 
 glue_output_modes = {
@@ -604,5 +604,5 @@ glue_output_modes = {
     "qnli": "classification",
     "rte": "classification",
     "wnli": "classification",
-    "boolq": "classification"
+    "BoolQ": "classification"
 }
