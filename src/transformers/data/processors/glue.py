@@ -17,6 +17,7 @@
 
 import logging
 import os
+import json
 
 from ...file_utils import is_tf_available
 from .utils import DataProcessor, InputExample, InputFeatures
@@ -516,6 +517,55 @@ class WnliProcessor(DataProcessor):
         return examples
 
 
+class BoolqProcessor(DataProcessor):
+    """Processor for the BoolQ data set."""  
+      
+    def get_example_from_tensor_dict(self, tensor_dict):
+        """See base class."""
+        return InputExample(
+            tensor_dict["idx"].numpy(),
+            tensor_dict["question"].numpy().decode("utf-8"),
+            tensor_dict["passage"].numpy().decode("utf-8"),
+            str(tensor_dict["label"].numpy()),
+        )
+
+    def get_train_examples(self, data_dir):
+        """See base class."""
+        logger.info("LOOKING AT {}".format(os.path.join(data_dir, "train.jsonl")))
+        return self._create_examples(self._read_jsonl(os.path.join(data_dir, "train.jsonl")), "train")
+
+    def get_dev_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(self._read_jsonl(os.path.join(data_dir, "val.jsonl")), "dev")
+
+    def get_labels(self):
+        """See base class."""
+        return ["True", "False"]
+
+    def _create_examples(self, lines, set_type):
+        """Creates examples for the training and dev sets."""
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % (set_type, line[2])
+            text_a = line[0]
+            text_b = line[1]
+            label = line[-1]
+            examples.append(InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+    
+    @classmethod
+    def _read_jsonl(cls, input_file):
+        data = []
+        with open(input_file) as f:
+            for line in f:
+                data.append(json.loads(line))
+        output_lst = [list(data[0].keys())]
+        for dic in data:
+            output_lst.append(list(dic.values()))
+        return output_lst
+
 glue_tasks_num_labels = {
     "cola": 2,
     "mnli": 3,
@@ -526,6 +576,7 @@ glue_tasks_num_labels = {
     "qnli": 2,
     "rte": 2,
     "wnli": 2,
+    "boolq": 2
 }
 
 glue_processors = {
@@ -539,6 +590,7 @@ glue_processors = {
     "qnli": QnliProcessor,
     "rte": RteProcessor,
     "wnli": WnliProcessor,
+    "boolq": BoolqProcessor
 }
 
 glue_output_modes = {
@@ -552,4 +604,5 @@ glue_output_modes = {
     "qnli": "classification",
     "rte": "classification",
     "wnli": "classification",
+    "boolq": "classification"
 }
